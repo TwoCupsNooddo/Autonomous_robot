@@ -1,0 +1,38 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="open_rviz" default="true"/>
+  <arg name="move_forward_only" default="false"/>
+  <arg name="map_file" default="$(find robot2_description)/map/test.yaml"/> 
+
+  <!-- Map server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- AMCL -->
+  <include file="$(find robot2_description)/launch/amcl.launch"/>
+
+  <!-- move_base -->
+  <include file="$(find robot2_description)/launch/move_base.launch">
+    <arg name="move_forward_only" value="$(arg move_forward_only)"/>
+  </include>
+
+  <!-- rviz -->
+  <group if="$(arg open_rviz)"> 
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find robot2_description)/config/robot_navigation.rviz"/>
+  </group>
+
+  <!-- model -->
+  <arg name="model" default="$(find robot2_description)/urdf/robot2.xacro"/>
+  <arg name="gui" default="false"/>
+  <arg name="rvizconfig" default="$(find robot2_description)/config/urdf.rviz"/>
+
+  <param command="xacro '$(find robot2_description)/urdf/robot2.xacro'" name="robot_description"/>
+
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+
+  
+</launch>
